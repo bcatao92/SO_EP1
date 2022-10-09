@@ -1,43 +1,56 @@
 package escalonador;
 
-/* Classe que representa o BLOCO DE CONTROLE DE PROCESSOS (BCP)
- * O BCP possui todas as informações do processo - tudo que é necessário 
- * para reiniciar um processo do ponto em que o mesmo foi interrompido.
- * Além de outras variáveis como registradores, prioridade, tempo de espera, crédito...
- */
+public class Processo {
+        //Usareamos as letras "p", "e" e "b" para se referir aos estados pronto, executando e bloqueado respectivamente.
+	String nome;
+	private char estado;
+	final String [] tarefas;  //O processo em si.
+	
+	public Processo(String nome, String[] tarefas, char estado) {
+		this.nome = nome;
+		this.setEstado(estado);
+		this.tarefas = instructions;
+	}
+	
+	public void setEstado(char estado) {
+		this.estado = estado;
+	}
+
+	public char getEstado() {
+		return estado;
+	}
+
+}
 
 public class BCP implements Comparable<BCP> {
 	Processo processo;
-	int prioridade;
-	int contadorDePrograma;
-	int registradorX;
-	int registradorY;
-	int credito;
+	int priori;
+	int cred;
+	int PC;
+	int X;
+	int Y;
 	int espera;
 	int flag;
 
-	public BCP(Processo processo, int prioridade) {
+	public BCP(Processo processo, int priori) {
 		this.processo = processo;
-		this.contadorDePrograma = 0;
-		this.prioridade = prioridade;
-		this.registradorX = 0;
-		this.registradorY = 0;
-		this.credito = prioridade;
+		this.priori = prioridade;
+		this.cred = priori;
+		this.PC = 0;
+		this.X = 0;
+		this.Y = 0;
 		this.espera = 0;
 		this.flag = 0;
 	}
 
-	// quando um processo será executado, diminui um crédito. É por esse crédito que os processos são ordenados
 	public void decrementaCredito() {
-		credito--;
+		this.cred--;
 	}
 
-	// Método sobreescrito para ordenar a tabela de processos pelo numero de créditos
-	@Override
 	public int compareTo(BCP bcp) {
-		if (this.credito < bcp.credito)
+		if (this.cred < bcp.cred)
 			return 1;
-		else if (this.credito > bcp.credito)
+		else if (this.cred > bcp.cred)
 			return -1;
 		else
 			return 0;
