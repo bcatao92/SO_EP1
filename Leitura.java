@@ -6,7 +6,7 @@ public class Leitura{
 	private String name;
 	private String [] instrucoes;
 	private BCP bcp;
-	public Leitura(int numArquivo) {
+	public Leitura(String numArquivo) {
 		try {
 			instrucoes = new String[21]; //inicializando o array que guarda o texto do programa
 			
@@ -22,19 +22,22 @@ public class Leitura{
 				Line = in.readLine();
 			}
 			prioridade = lePrioridade(numArquivo);
-			BCP bcp = new BCP(name, instrucoes, prioridade);
+			//System.out.println(prioridade + name);
+			bcp = new BCP(name, instrucoes, prioridade);
+			in.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("File name not found");
+			System.out.println(numArquivo + ".txt");
 		} catch (IOException e) {
 			System.out.println("Invalid File format");
 		}
 	}
-	private int lePrioridade(int numArquivo) throws IOException {
+	private int lePrioridade(String numArquivo) throws IOException {
 		BufferedReader in;
 		in = new BufferedReader(new FileReader("prioridades.txt"));
 		int prioridade = 0;
 		String Line = new String();
-		for(int i = 0; i < numArquivo; i++) {
+		for(int i = 0; i < Integer.parseInt(numArquivo); i++) {
 			Line = in.readLine();
 			prioridade = Integer.parseInt(Line);
 		}
@@ -42,6 +45,6 @@ public class Leitura{
 		return prioridade;
 	}
 	public BCP getBCP() {
-		return bcp;
+		return this.bcp;
 	}
 }

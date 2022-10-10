@@ -24,4 +24,7 @@ public class BCP implements Comparable<BCP>{
 		else if(this.creditos == bcp.creditos) return 0;
 		else return -1;
 	}
+	public void print() {
+		for(int i = 0; i < instrucoes.length; i++) System.out.println(instrucoes[i]);
+	}
 }
