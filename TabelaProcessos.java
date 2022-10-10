@@ -5,8 +5,8 @@ package escalonador;
  */
 
 public class TabelaProcessos {
-	static SortedList prontos = new SortedList();
-	static SortedList bloqueados = new SortedList();	
+	static sortedlist prontos = new sortedlist();
+	static sortedlist bloqueados = new sortedlist();	
 
 	public static void adicionaBlocoProntos(BCP bloco) {
 		prontos.insertSorted(bloco);
