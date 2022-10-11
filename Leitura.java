@@ -1,4 +1,5 @@
 package escalonador;
+
 import java.io.*;
 
 public class Leitura{

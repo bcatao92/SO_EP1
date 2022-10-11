@@ -1,5 +1,6 @@
 package escalonador;
 
+
 public class BCP implements Comparable<BCP>{
 	private int PC; //Program Counter
 	private int estado; //0 = bloqueado 1 = pronto
