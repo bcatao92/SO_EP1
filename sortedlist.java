@@ -3,7 +3,7 @@ package escalonador;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class SortedList extends ArrayList<BCP> {
+public class sortedlist extends ArrayList<BCP> {
 	
 	private static final long serialVersionUID = 1L;
 

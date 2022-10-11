@@ -1,75 +1,51 @@
 package escalonador;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
-public class Leitura {
-	private int maxProcessos = 10;
-	private int[] prioridades;
-	private int numProcesso = 0; //saber em qual processo está acontecendo a leitura
-	private int quantum;
-	
-	public Leitura() throws Exception {
-		prioridades = new int[maxProcessos];
-		lerPrioridades();
-		lerArquivos();
-		lerQuantum();
-	}
-	
-	//abre o arquivo prioridades e coloca os valores em um arranjo
-	private void lerPrioridades() throws Exception {
-		BufferedReader br = new BufferedReader(new FileReader(new File("src/processos/prioridades.txt")));
-		for (int i = 0; i < maxProcessos; i++) {
-			prioridades[i] = Integer.parseInt(br.readLine());
-		}
-		br.close();
-	}
-	
-	//abre cada um dos arquivos de processos
-	private void lerArquivos() throws IOException {
-		for (int i = 1; i <= 10; i++) {
-			FileReader arquivo = new FileReader(i != 10 ? "src/processos/0"+i+".txt" : "src/processos/10.txt");
-			numProcesso = i-1;
-			armazenaProcesso(arquivo);
-		}
-	}
-	
-	//le todo o arquivo do processo e cria um novo BCP
-	private void armazenaProcesso (FileReader arquivo) throws IOException {
-		BufferedReader br = new BufferedReader(arquivo);
-		String[] instrucao = new String[21];
-		String nome = br.readLine();
-		int cont = 0;
-		String aux = null;
-		while (!"SAIDA".equals(aux) && cont<21) {
-			aux = br.readLine();
-			if (aux != null) {
-				instrucao[cont] = aux;
-				cont++;
+public class Leitura{
+	private int prioridade;
+	private String name;
+	private String [] instrucoes;
+	private BCP bcp;
+	public Leitura(String numArquivo) {
+		try {
+			instrucoes = new String[21]; //inicializando o array que guarda o texto do programa
+			
+			
+			BufferedReader in = new BufferedReader(new FileReader(numArquivo + ".txt"));
+			String Line = in.readLine();
+			name = Line;//nome do arquivo
+			
+			//lê o programa
+			Line = in.readLine();
+			for(int i = 0;  Line != null; i++) {
+				instrucoes[i] = Line;
+				Line = in.readLine();
 			}
+			prioridade = lePrioridade(numArquivo);
+			//System.out.println(prioridade + name);
+			bcp = new BCP(name, instrucoes, prioridade);
+			in.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("File name not found");
+			System.out.println(numArquivo + ".txt");
+		} catch (IOException e) {
+			System.out.println("Invalid File format");
 		}
-		
-		br.close();
-		Processo processo = new Processo(nome, instrucao, Processo.PRONTO);
-		criaBCP(processo);
 	}
-
-	//adiciona o BCP na lista de processos prontos
-	private void criaBCP(Processo processo) {
-		BCP bcp = new BCP(processo, prioridades[numProcesso]);
-		TabelaProcessos.adicionaBlocoProntos(bcp);
+	private int lePrioridade(String numArquivo) throws IOException {
+		BufferedReader in;
+		in = new BufferedReader(new FileReader("prioridades.txt"));
+		int prioridade = 0;
+		String Line = new String();
+		for(int i = 0; i < Integer.parseInt(numArquivo); i++) {
+			Line = in.readLine();
+			prioridade = Integer.parseInt(Line);
+		}
+		in.close();
+		return prioridade;
 	}
-	
-	//le o quantum do arquivo quantum.txt
-	private void lerQuantum () throws NumberFormatException, IOException {
-		BufferedReader br = new BufferedReader(new FileReader(new File("src/processos/quantum.txt")));
-		this.quantum = Integer.parseInt(br.readLine());
-		br.close();
-	}
-
-	public int getQuantum() {
-		return quantum;
+	public BCP getBCP() {
+		return this.bcp;
 	}
 }
