@@ -7,9 +7,10 @@ public class BCP implements Comparable<BCP>{
 	private int prioridade;
 	private int creditos;
 	private int X,Y;
+	private int flag;
 	private String [] instrucoes;
 	private String nome;
-	
+
 	public BCP(String nome, String [] instrucoes, int prioridade) {
 		PC = 0;
 		X = 0;
@@ -20,10 +21,15 @@ public class BCP implements Comparable<BCP>{
 		this.prioridade = prioridade;
 		this.creditos = prioridade;
 	}
+
+	public consomeCredito() {
+		creditos--;
+	}
+
 	public int compareTo(BCP bcp) {
 		if(this.creditos > bcp.creditos) return 1;
-		else if(this.creditos == bcp.creditos) return 0;
-		else return -1;
+		if(this.creditos == bcp.creditos) return 0;
+		return -1;
 	}
 	public void print() {
 		for(int i = 0; i < instrucoes.length; i++) System.out.println(instrucoes[i]);
