@@ -17,9 +17,9 @@ public class BCP implements Comparable<BCP> {
         this.creditos = prioridade;
     }
 
-    public consomeCredito() {
-		creditos--;
-	}
+    public void consomeCredito() {
+        creditos--;
+    }
 
     public int compareTo(BCP bcp) {
         if (this.creditos > bcp.creditos)
