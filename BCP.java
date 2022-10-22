@@ -1,8 +1,11 @@
 package escalonador;
 
 public class BCP implements Comparable<BCP> {
-    private int PC, estado, prioridade, creditos, espera, X, Y;
-    private boolean executado;
+    private int PC, estado, prioridade, creditos;
+    int espera;
+    private int X;
+    private int Y;
+    boolean executado;
     private String[] instrucoes;
     private String nome;
 
