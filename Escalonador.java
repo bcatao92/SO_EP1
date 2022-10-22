@@ -6,7 +6,7 @@ import static escalonador.TabelaProcessos.prontos;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
-public class Escalonador {
+public class escalonador {
 
     private static int quantum;
     private static int interrupcoes = 0;
@@ -39,7 +39,7 @@ public class Escalonador {
 
     }
 
-    private static void criaLog() {
+    private static void criarLog(int quantum) {
         if (quantum < 10) {
             System.setOut(new PrintStream(new FileOutputStream("log0" + quantum + ".txt")));
         } else {
@@ -54,7 +54,7 @@ public class Escalonador {
         atual.processo.setEstado(Estado.EXECUTANDO);
         System.out.println("Executando processo " + atual.processo.nome);
         while (atual != null && cont < quantum) {
-            administraInstrucao(atual, termino, saida);
+            administraInstrucao(atual, termino, suspenso);
             atual.PC++;
             cont++;
         }
@@ -78,6 +78,7 @@ public class Escalonador {
 
     private static void administraInstrucao(BCP atual) {
         String instrucao = atual.processo.instrucao[atual.PC];
+        boolean suspenso, termino;
 
         if (instrucao.equals("E/S")) {
             if (!atual.executado) {
@@ -112,8 +113,8 @@ public class Escalonador {
         atual.processo.setEstado(Estado.BLOQUEADO);
         TabelaProcessos.adicionaBlocoBloqueados(atual);
         int i = bloqueados.indexOf(atual);
-        bloqueados.get(index).espera = 2;
-        bloqueados.get(index).executado = true;
+        bloqueados.get(i).espera = 2;
+        bloqueados.get(i).executado = true;
     }
 
     private static boolean verificaCreditosProntos() {
@@ -127,7 +128,7 @@ public class Escalonador {
         return true;
     }
 
-    private static void decrementaBloqueados() {
+    private static void decrementaEsperaBloqueados() {
         for (BCP b : bloqueados) {
             if (b.getEspera() > 0)
                 b.setEspera(b.getEspera() - 1);
