@@ -3,6 +3,7 @@ package escalonador;
 import static escalonador.TabelaProcessos.bloqueados;
 import static escalonador.TabelaProcessos.prontos;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
@@ -15,13 +16,13 @@ public class escalonador {
     private final static int processos = 10;
 
     public static void main(String[] args) throws Exception {
-        Leitura leitura = new Leitura();
-        int quantum = leitura.getQuantum();
+        Leitura leitura = new Leitura(processos);
+        quantum = leitura.getQuantum();
 
         criarLog(quantum);
 
         for (BCP bcp : prontos) {
-            System.out.println("Carregando processo " + bcp.processo.nome);
+            System.out.println("Carregando processo " + bcp.getNome());
         }
 
         while (prontos.size() > 0 || bloqueados.size() > 0) {
@@ -30,7 +31,7 @@ public class escalonador {
             verificaEspera();
             verificaCreditosProntos();
         }
-
+        // TESTE
         System.out.println("media de trocas: " + interrupcoes / processos);
 
         System.out.println("media de instruções: " + instrucoes / contQuantuns);
@@ -39,7 +40,7 @@ public class escalonador {
 
     }
 
-    private static void criarLog(int quantum) {
+    private static void criarLog(int quantum) throws FileNotFoundException {
         if (quantum < 10) {
             System.setOut(new PrintStream(new FileOutputStream("log0" + quantum + ".txt")));
         } else {
@@ -47,22 +48,29 @@ public class escalonador {
         }
     }
 
+    /*
+     * Essa função é responsável por processar cada instrução do programa, além de
+     * também
+     * definir se o programa foi ou não colocado na fila de bloeuqdos devido a uma
+     * chamada de E/S
+     */
     private static void administraProcesso(BCP atual, int quantum) {
         int cont = 0;
-        boolean termino = false, suspenso = false;
+        atual.termino = false;
+        atual.suspenso = false;
         atual.consomeCredito();
-        atual.processo.setEstado(Estado.EXECUTANDO);
-        System.out.println("Executando processo " + atual.processo.nome);
-        while (atual != null && cont < quantum) {
-            administraInstrucao(atual, termino, suspenso);
+        atual.estado = 2;
+        System.out.println("Executando processo " + atual.getNome());
+        while (cont < quantum) {
+            administraInstrucao(atual);
             atual.PC++;
             cont++;
         }
-        if (!termino) {
+        if (atual.termino) {
             if (cont < 2) {
-                System.out.println("Interrompendo " + atual.processo.nome + " após " + cont + " instrução");
+                System.out.println("Interrompendo " + atual.getNome() + " após " + cont + " instrução");
             } else {
-                System.out.println("Interrompendo " + atual.processo.nome + " após " + cont + " instruções");
+                System.out.println("Interrompendo " + atual.getNome() + " após " + cont + " instruções");
             }
         }
 
@@ -70,47 +78,53 @@ public class escalonador {
         contQuantuns++;
         instrucoes += cont;
 
-        if (!suspenso) {
-            atual.processo.setEstado(Estado.PRONTO);
+        if (atual.suspenso) {
+            atual.estado = 0;
             TabelaProcessos.adicionaBlocoProntos(atual);
         }
     }
 
+    /*
+     * Essa função é responsável por processar cada instrução do programa, além de
+     * também
+     * definir se o programa foi ou não colocado na fila de bloeuqdos devido a uma
+     * chamada de E/S
+     */
     private static void administraInstrucao(BCP atual) {
-        String instrucao = atual.processo.instrucao[atual.PC];
-        boolean suspenso, termino;
+        String instrucao = atual.instrucoes[atual.PC];
 
+        // Processa instruções de E/S
         if (instrucao.equals("E/S")) {
             if (!atual.executado) {
-                System.out.println("E/S iniciada em " + atual.processo.nome);
+                System.out.println("E/S iniciada em " + atual.nome);
                 entradaSaida(atual);
-                suspenso = true;
-                break;
+                atual.suspenso = true;
             } else {
                 atual.executado = false;
             }
         }
 
         else if (instrucao.equals("FIM")) {
-            System.out.println(atual.processo.nome + " terminou. Sendo, X=" + atual.registradorX + " e Y="
-                    + atual.registradorY);
+            System.out.println(atual.getNome() + " terminou. Sendo, X=" + atual.X + " e Y="
+                    + atual.Y);
             prontos.remove(atual);
-            suspenso = true;
-            termino = true;
-            break;
+            atual.suspenso = true;
+            atual.termino = true;
         }
 
+        // Para instruções que utilizam o registrador X
         else if (instrucao.contains("X=")) {
-            atual.registradorX = Integer.parseInt(instrucao.substring(2));
+            atual.X = Integer.parseInt(instrucao.substring(2));
         }
 
+        // Para instruções que utilizam o registrador Y
         else if (instrucao.contains("Y=")) {
-            atual.registradorY = Integer.parseInt(instrucao.substring(2));
+            atual.Y = Integer.parseInt(instrucao.substring(2));
         }
     }
 
     private static void entradaSaida(BCP atual) {
-        atual.processo.setEstado(Estado.BLOQUEADO);
+        atual.estado = 0;
         TabelaProcessos.adicionaBlocoBloqueados(atual);
         int i = bloqueados.indexOf(atual);
         bloqueados.get(i).espera = 2;
@@ -142,7 +156,7 @@ public class escalonador {
             if (b.getEspera() != 0) {
                 break;
             }
-            b.processo.setEstado(Estado.PRONTO);
+            b.estado = 1;
             TabelaProcessos.adicionaBlocoProntos(b);
             cont++;
         }
