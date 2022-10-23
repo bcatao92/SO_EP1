@@ -1,13 +1,14 @@
 package escalonador;
 
 public class BCP implements Comparable<BCP> {
-    private int PC, estado, prioridade, creditos;
+    int PC, estado, prioridade, creditos; // Estado: 2 = executando; 1 = pronto; 0 = espera
     int espera;
-    private int X;
-    private int Y;
+    int X;
+    int Y;
     boolean executado;
-    private String[] instrucoes;
-    private String nome;
+    boolean termino, suspenso;
+    String[] instrucoes;
+    String nome;
 
     public BCP(String nome, String[] instrucoes, int prioridade) {
         PC = 0;
@@ -30,6 +31,10 @@ public class BCP implements Comparable<BCP> {
         if (this.creditos == bcp.creditos)
             return 0;
         return -1;
+    }
+
+    public String getNome() {
+        return nome;
     }
 
     public int getPrioridade() {
@@ -57,6 +62,7 @@ public class BCP implements Comparable<BCP> {
     }
 
     public void print() {
+        System.out.println(prioridade);
         for (int i = 0; i < instrucoes.length; i++)
             System.out.println(instrucoes[i]);
     }
